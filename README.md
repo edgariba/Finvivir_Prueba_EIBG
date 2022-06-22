@@ -12,4 +12,4 @@ docker run -d -p 33060:3306 --name mysql-db -e MYSQL_ROOT_PASSWORD=secret mysql
 docker exec -it mysql-db mysql -uroot -p
 
 * La base de datos creada se llama: weatherFinvivir
-* La tabla creada se llamada: t_wheather
+* La tabla creada se llamada: t_weather

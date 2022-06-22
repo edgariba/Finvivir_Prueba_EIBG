@@ -25,7 +25,7 @@ public class WeatherController {
     private WeatherBusiness weatherBusiness;
 
     /**
-     * Obtener los resultados del clima
+     * GET resultados del clima
      *
      * @param city
      * @return
@@ -49,7 +49,7 @@ public class WeatherController {
 
 
     /**
-     * Obtener los ultimos 10 resultados
+     * Get los ultimos 10 resultados
      *
      * @return
      */

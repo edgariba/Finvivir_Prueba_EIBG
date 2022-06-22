@@ -4,6 +4,9 @@ import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
+/**
+ * Clase con los objetos del response de open weather mas los datos de consulta
+ */
 public class WeatherData {
     public Coord coord;
     public List<Weather> weather;

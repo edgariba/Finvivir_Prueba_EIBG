@@ -3,6 +3,9 @@ package com.finvivir.pruebaeibg.Pojos;
 import java.math.BigDecimal;
 import java.util.List;
 
+/**
+ * Clase con los objetos del response de open weather
+ */
 public class WeatherGeneral {
     public Coord coord;
     public List<Weather> weather;

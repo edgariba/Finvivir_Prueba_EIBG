@@ -9,6 +9,12 @@ public class WeatherListResponse {
     public HeaderResponse header;
     public List<WeatherData> weatherList;
 
+    /**
+     * Constructor para la lista de ciudades
+     *
+     * @param header
+     * @param weatherList
+     */
     public WeatherListResponse(HeaderResponse header, List<WeatherData> weatherList) {
         this.header = header;
         this.weatherList = weatherList;

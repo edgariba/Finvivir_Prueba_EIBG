@@ -15,7 +15,6 @@ import okhttp3.Request;
 import okhttp3.Response;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -42,6 +41,7 @@ public class WeatherBusinessImpl implements WeatherBusiness {
         WeatherResponse response;
         WeatherEntity save;
         msg = ConstantText.MSG_GET;
+        //Se invoca el api de open weather
         OkHttpClient client = new OkHttpClient().newBuilder()
                 .build();
         Request request = new Request.Builder()
@@ -59,13 +59,13 @@ public class WeatherBusinessImpl implements WeatherBusiness {
                 //Verifico si existe registro de ciudad en Mysql
                 Optional<WeatherEntity> weatherByIdOpen = weatherDao.findByOpenId(weather.id);
                 if (weatherByIdOpen.isPresent()) {
-                    //Actualizar registro
+                    //Existe ciudad : actualizar registro
                     int numberConsults = weatherByIdOpen.get().getConsults() + 1;
                     WeatherEntity weatherTransform = transformToEntity(weather, numberConsults, weatherByIdOpen.get());
                     weatherTransform.setDateUpdate(new Date());
                     save = weatherDao.save(weatherTransform);
                 } else {
-                    //Agregar nuevo registro
+                    //No existe : Agregar nuevo registro
                     WeatherEntity weatherEntity = new WeatherEntity();
                     WeatherEntity weatherTransform = transformToEntity(weather, 1, weatherEntity);
                     weatherTransform.setDateAdd(new Date());
@@ -75,6 +75,7 @@ public class WeatherBusinessImpl implements WeatherBusiness {
                 response = new WeatherResponse(new HeaderResponse(ConstantText.SUCCESS, HttpStatus.OK.value(), msg), transformToJsonResponse(save));
                 return new ResponseEntity<>(response, HttpStatus.OK);
             } else {
+                //Si existe un error al invocar el api lanzo la excepcion
                 JSONObject result = new JSONObject(weatherApiResponse);
                 throw new ConflictException(result.get("message").toString());
             }
@@ -114,6 +115,7 @@ public class WeatherBusinessImpl implements WeatherBusiness {
             weatherEntity.setMain(weatherData.main);
             weatherEntity.setDescription(weatherData.description);
             weatherEntity.setIcon(weatherData.icon);
+            break;
         }
         weatherEntity.setBase(weather.getBase());
 

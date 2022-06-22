@@ -38,7 +38,8 @@ public class WeatherBusinessImpl implements WeatherBusiness {
     public ResponseEntity<WeatherResponse> consultCity(String city) {
         String msg;
         WeatherResponse response;
-        WeatherEntity save = null;
+        WeatherEntity save;
+        msg = ConstantText.MSG_GET;
         OkHttpClient client = new OkHttpClient().newBuilder()
                 .build();
         Request request = new Request.Builder()
@@ -68,8 +69,6 @@ public class WeatherBusinessImpl implements WeatherBusiness {
                     weatherTransform.setDateAdd(new Date());
                     save = weatherDao.save(weatherTransform);
                 }
-
-                msg = ConstantText.MSG_GET;
                 response = new WeatherResponse(new HeaderResponse(ConstantText.SUCCESS, HttpStatus.OK.value(), msg), transformToJsonResponse(save));
                 return new ResponseEntity<>(response, HttpStatus.OK);
             } else {
@@ -78,8 +77,15 @@ public class WeatherBusinessImpl implements WeatherBusiness {
             }
 
         } catch (IOException e) {
-            //Si el api no esta disponible, busco en la base local el utimo estatus
-            throw new RuntimeException(e);
+            //Si el api no esta disponible, busco en la base local el utimo registro
+            Optional<WeatherEntity> weatherByCity = weatherDao.findByName(city);
+            if (weatherByCity.isPresent()) {
+                response = new WeatherResponse(new HeaderResponse(ConstantText.SUCCESS, HttpStatus.OK.value(), msg), transformToJsonResponse(weatherByCity.get()));
+                return new ResponseEntity<>(response, HttpStatus.OK);
+            } else {
+                msg = ConstantText.MSG_EMPTY;
+                throw new ConflictException(msg);
+            }
         }
 
     }

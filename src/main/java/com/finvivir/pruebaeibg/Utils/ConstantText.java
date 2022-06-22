@@ -12,6 +12,8 @@ public class ConstantText {
 
     //COMUNES
     public static final String MSG_GET = "Se obtuvo exitosamente el registro.";
+    public static final String MSG_EMPTY = "No fue posible obtener los datos de la ciudad.";
+
 
     //URL API OPENWEATHER
     public static final String API_WEATHER = "https://api.openweathermap.org/data/2.5/weather?q=";

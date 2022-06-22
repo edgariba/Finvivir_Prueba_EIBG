@@ -104,11 +104,11 @@ public class WeatherEntity {
     @Column(name = "consults")
     private Integer consults;
 
-    @Column(name = "date_add")
+    @Column(name = "dateAdd")
     @Temporal(TemporalType.TIMESTAMP)
     public Date dateAdd;
 
-    @Column(name = "date_update")
+    @Column(name = "dateUpdate")
     public Date dateUpdate;
 
 

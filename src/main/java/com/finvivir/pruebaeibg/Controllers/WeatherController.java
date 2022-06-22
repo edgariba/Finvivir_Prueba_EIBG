@@ -4,6 +4,7 @@ import com.finvivir.pruebaeibg.Business.Interfaces.WeatherBusiness;
 import com.finvivir.pruebaeibg.Exceptions.ConflictException;
 import com.finvivir.pruebaeibg.Utils.ConstantText;
 import com.finvivir.pruebaeibg.Utils.Header.HeaderResponse;
+import com.finvivir.pruebaeibg.Ws.Response.WeatherListResponse;
 import com.finvivir.pruebaeibg.Ws.Response.WeatherResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -26,6 +27,7 @@ public class WeatherController {
     /**
      * Obtener los resultados del clima
      *
+     * @param city
      * @return
      */
     @GetMapping(value = "/getByCity/{city}")
@@ -45,4 +47,26 @@ public class WeatherController {
         }
     }
 
+
+    /**
+     * Obtener los ultimos 10 resultados
+     *
+     * @return
+     */
+    @GetMapping(value = "/getLastTenCities")
+    public ResponseEntity<WeatherListResponse> getLastTenCities() {
+        WeatherListResponse response;
+        String msg;
+        try {
+            return weatherBusiness.getLastTenCities();
+        } catch (ConflictException e) {
+            msg = e.getMessage();
+            response = new WeatherListResponse(new HeaderResponse(ConstantText.CONFLICT, HttpStatus.CONFLICT.value(), msg), null);
+            return new ResponseEntity<>(response, HttpStatus.CONFLICT);
+        } catch (Exception e) {
+            msg = e.getMessage();
+            response = new WeatherListResponse(new HeaderResponse(ConstantText.INTERNAL_SERVER_ERROR, HttpStatus.INTERNAL_SERVER_ERROR.value(), msg), null);
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 }

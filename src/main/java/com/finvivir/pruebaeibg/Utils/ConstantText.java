@@ -7,11 +7,11 @@ public class ConstantText {
     //SEVERITY TEXTS
     public static final String CONFLICT = "CONFLICT";
     public static final String SUCCESS = "SUCCESS";
-    public static final String BAD_REQUEST = "BAD REQUEST";
     public static final String INTERNAL_SERVER_ERROR = "INTERNAL SERVER ERROR";
 
     //COMUNES
     public static final String MSG_GET = "Se obtuvo exitosamente el registro.";
+    public static final String MSG_LIST = "Se obtuvo exitosamente la lista de ciudades.";
     public static final String MSG_EMPTY = "No fue posible obtener los datos de la ciudad.";
 
 

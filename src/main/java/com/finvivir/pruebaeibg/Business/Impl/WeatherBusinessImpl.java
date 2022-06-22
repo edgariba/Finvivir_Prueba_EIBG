@@ -7,6 +7,7 @@ import com.finvivir.pruebaeibg.Exceptions.ConflictException;
 import com.finvivir.pruebaeibg.Pojos.*;
 import com.finvivir.pruebaeibg.Utils.ConstantText;
 import com.finvivir.pruebaeibg.Utils.Header.HeaderResponse;
+import com.finvivir.pruebaeibg.Ws.Response.WeatherListResponse;
 import com.finvivir.pruebaeibg.Ws.Response.WeatherResponse;
 import com.google.gson.Gson;
 import okhttp3.OkHttpClient;
@@ -14,6 +15,7 @@ import okhttp3.Request;
 import okhttp3.Response;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -67,6 +69,7 @@ public class WeatherBusinessImpl implements WeatherBusiness {
                     WeatherEntity weatherEntity = new WeatherEntity();
                     WeatherEntity weatherTransform = transformToEntity(weather, 1, weatherEntity);
                     weatherTransform.setDateAdd(new Date());
+                    weatherTransform.setDateUpdate(new Date());
                     save = weatherDao.save(weatherTransform);
                 }
                 response = new WeatherResponse(new HeaderResponse(ConstantText.SUCCESS, HttpStatus.OK.value(), msg), transformToJsonResponse(save));
@@ -88,6 +91,18 @@ public class WeatherBusinessImpl implements WeatherBusiness {
             }
         }
 
+    }
+
+    @Override
+    public ResponseEntity<WeatherListResponse> getLastTenCities() {
+        String msg;
+        WeatherListResponse response;
+        List<WeatherData> weatherTransform = new ArrayList<>();
+        List<WeatherEntity> weatherList = weatherDao.getLastCities(10);
+        weatherList.forEach(weatherEntity -> weatherTransform.add(transformToJsonResponse(weatherEntity)));
+        msg = ConstantText.MSG_LIST;
+        response = new WeatherListResponse(new HeaderResponse(ConstantText.SUCCESS, HttpStatus.OK.value(), msg), weatherTransform);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     public WeatherEntity transformToEntity(WeatherGeneral weather, Integer consults, WeatherEntity weatherEntity) {

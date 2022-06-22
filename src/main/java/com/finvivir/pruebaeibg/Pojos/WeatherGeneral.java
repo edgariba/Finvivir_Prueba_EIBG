@@ -1,10 +1,11 @@
 package com.finvivir.pruebaeibg.Pojos;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 public class WeatherGeneral {
     public Coord coord;
-    public Weather[] weather;
+    public List<Weather> weather;
     public String base;
     public Main main;
     public BigDecimal visibility;
@@ -17,7 +18,6 @@ public class WeatherGeneral {
     public String name;
     public Integer cod;
 
-
     public Coord getCoord() {
         return coord;
     }
@@ -26,11 +26,11 @@ public class WeatherGeneral {
         this.coord = coord;
     }
 
-    public Weather[] getWeather() {
+    public List<Weather> getWeather() {
         return weather;
     }
 
-    public void setWeather(Weather[] weather) {
+    public void setWeather(List<Weather> weather) {
         this.weather = weather;
     }
 

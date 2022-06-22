@@ -3,8 +3,7 @@ package com.finvivir.pruebaeibg.Business.Impl;
 import com.finvivir.pruebaeibg.Business.Interfaces.WeatherBusiness;
 import com.finvivir.pruebaeibg.Dao.WeatherDao;
 import com.finvivir.pruebaeibg.Entity.WeatherEntity;
-import com.finvivir.pruebaeibg.Pojos.Weather;
-import com.finvivir.pruebaeibg.Pojos.WeatherGeneral;
+import com.finvivir.pruebaeibg.Pojos.*;
 import com.finvivir.pruebaeibg.Utils.ConstantText;
 import com.finvivir.pruebaeibg.Utils.Header.HeaderResponse;
 import com.finvivir.pruebaeibg.Ws.Response.WeatherResponse;
@@ -21,7 +20,9 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 
 @Service("weatherBusinessImpl")
@@ -35,6 +36,7 @@ public class WeatherBusinessImpl implements WeatherBusiness {
     public ResponseEntity<WeatherResponse> consultCity(String city) {
         String msg;
         WeatherResponse response;
+        WeatherEntity save = null;
         OkHttpClient client = new OkHttpClient().newBuilder()
                 .build();
         Request request = new Request.Builder()
@@ -55,17 +57,17 @@ public class WeatherBusinessImpl implements WeatherBusiness {
                 int numberConsults = weatherByIdOpen.get().getConsults() + 1;
                 WeatherEntity weatherTransform = transformToEntity(weather, numberConsults, weatherByIdOpen.get());
                 weatherTransform.setDateUpdate(new Date());
-                weatherDao.save(weatherTransform);
+                save = weatherDao.save(weatherTransform);
             } else {
                 //Agregar nuevo registro
                 WeatherEntity weatherEntity = new WeatherEntity();
                 WeatherEntity weatherTransform = transformToEntity(weather, 1, weatherEntity);
                 weatherTransform.setDateAdd(new Date());
-                weatherDao.save(weatherTransform);
+                save = weatherDao.save(weatherTransform);
             }
 
             msg = ConstantText.MSG_GET;
-            response = new WeatherResponse(new HeaderResponse(ConstantText.SUCCESS, HttpStatus.OK.value(), msg), weather);
+            response = new WeatherResponse(new HeaderResponse(ConstantText.SUCCESS, HttpStatus.OK.value(), msg), transformToJsonResponse(save));
             return new ResponseEntity<>(response, HttpStatus.OK);
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -115,6 +117,30 @@ public class WeatherBusinessImpl implements WeatherBusiness {
         weatherEntity.setCod(weather.getCod());
         weatherEntity.setConsults(consults);
         return weatherEntity;
+    }
+
+    public WeatherData transformToJsonResponse(WeatherEntity weatherEntity){
+        List<Weather> weathers = new ArrayList<>();
+        weathers.add(new Weather(weatherEntity.getId_w(), weatherEntity.getMain(), weatherEntity.getDescription(), weatherEntity.getIcon()));
+        WeatherData weatherGeneral = new WeatherData(
+                new Coord(weatherEntity.getLon(), weatherEntity.getLat()),
+                weathers,
+                weatherEntity.getBase(),
+                new Main(weatherEntity.getTemp(), weatherEntity.getFeels_like(), weatherEntity.getTemp_min(), weatherEntity.getTemp_max(), weatherEntity.getPressure(),
+                        weatherEntity.getHumidity(), weatherEntity.getSea_level(), weatherEntity.getGrnd_level()),
+                weatherEntity.getVisibility(),
+                new Wind(weatherEntity.getSpeed(), weatherEntity.getDeg(), weatherEntity.getGust()),
+                new Clouds(weatherEntity.getAll_clouds()),
+                weatherEntity.getDt(),
+                new Sys(weatherEntity.getCountry(), weatherEntity.getSunrise(), weatherEntity.getSunset()),
+                weatherEntity.getTimezone(),
+                weatherEntity.getId(),
+                weatherEntity.getName(),
+                weatherEntity.getCod(),
+                weatherEntity.getConsults(),
+                weatherEntity.getDateUpdate()
+        );
+        return weatherGeneral;
     }
 }
 

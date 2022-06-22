@@ -3,6 +3,7 @@ package com.finvivir.pruebaeibg.Business.Impl;
 import com.finvivir.pruebaeibg.Business.Interfaces.WeatherBusiness;
 import com.finvivir.pruebaeibg.Dao.WeatherDao;
 import com.finvivir.pruebaeibg.Entity.WeatherEntity;
+import com.finvivir.pruebaeibg.Exceptions.ConflictException;
 import com.finvivir.pruebaeibg.Pojos.*;
 import com.finvivir.pruebaeibg.Utils.ConstantText;
 import com.finvivir.pruebaeibg.Utils.Header.HeaderResponse;
@@ -11,6 +12,7 @@ import com.google.gson.Gson;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -43,33 +45,40 @@ public class WeatherBusinessImpl implements WeatherBusiness {
                 .url(ConstantText.API_WEATHER + city + "&APPID=" + ConstantText.APID_WEATHER)
                 .method("GET", null)
                 .build();
+        Gson gson = new Gson();
         //Verifico la respuesta del endpoint de open weather
         try (Response responseW = client.newCall(request).execute()) {
             String weatherApiResponse = responseW.body().string();
-            //Convierto el response al objeto
-            Gson gson = new Gson();
-            WeatherGeneral weather = gson.fromJson(weatherApiResponse, WeatherGeneral.class);
+            if (responseW.isSuccessful()) {
+                //Convierto el response al objeto
+                WeatherGeneral weather = gson.fromJson(weatherApiResponse, WeatherGeneral.class);
 
-            //Verifico si existe registro de ciudad en Mysql
-            Optional<WeatherEntity> weatherByIdOpen = weatherDao.findByOpenId(weather.id);
-            if (weatherByIdOpen.isPresent()) {
-                //Actualizar registro
-                int numberConsults = weatherByIdOpen.get().getConsults() + 1;
-                WeatherEntity weatherTransform = transformToEntity(weather, numberConsults, weatherByIdOpen.get());
-                weatherTransform.setDateUpdate(new Date());
-                save = weatherDao.save(weatherTransform);
+                //Verifico si existe registro de ciudad en Mysql
+                Optional<WeatherEntity> weatherByIdOpen = weatherDao.findByOpenId(weather.id);
+                if (weatherByIdOpen.isPresent()) {
+                    //Actualizar registro
+                    int numberConsults = weatherByIdOpen.get().getConsults() + 1;
+                    WeatherEntity weatherTransform = transformToEntity(weather, numberConsults, weatherByIdOpen.get());
+                    weatherTransform.setDateUpdate(new Date());
+                    save = weatherDao.save(weatherTransform);
+                } else {
+                    //Agregar nuevo registro
+                    WeatherEntity weatherEntity = new WeatherEntity();
+                    WeatherEntity weatherTransform = transformToEntity(weather, 1, weatherEntity);
+                    weatherTransform.setDateAdd(new Date());
+                    save = weatherDao.save(weatherTransform);
+                }
+
+                msg = ConstantText.MSG_GET;
+                response = new WeatherResponse(new HeaderResponse(ConstantText.SUCCESS, HttpStatus.OK.value(), msg), transformToJsonResponse(save));
+                return new ResponseEntity<>(response, HttpStatus.OK);
             } else {
-                //Agregar nuevo registro
-                WeatherEntity weatherEntity = new WeatherEntity();
-                WeatherEntity weatherTransform = transformToEntity(weather, 1, weatherEntity);
-                weatherTransform.setDateAdd(new Date());
-                save = weatherDao.save(weatherTransform);
+                JSONObject result = new JSONObject(weatherApiResponse);
+                throw new ConflictException(result.get("message").toString());
             }
 
-            msg = ConstantText.MSG_GET;
-            response = new WeatherResponse(new HeaderResponse(ConstantText.SUCCESS, HttpStatus.OK.value(), msg), transformToJsonResponse(save));
-            return new ResponseEntity<>(response, HttpStatus.OK);
         } catch (IOException e) {
+            //Si el api no esta disponible, busco en la base local el utimo estatus
             throw new RuntimeException(e);
         }
 
@@ -119,7 +128,7 @@ public class WeatherBusinessImpl implements WeatherBusiness {
         return weatherEntity;
     }
 
-    public WeatherData transformToJsonResponse(WeatherEntity weatherEntity){
+    public WeatherData transformToJsonResponse(WeatherEntity weatherEntity) {
         List<Weather> weathers = new ArrayList<>();
         weathers.add(new Weather(weatherEntity.getId_w(), weatherEntity.getMain(), weatherEntity.getDescription(), weatherEntity.getIcon()));
         WeatherData weatherGeneral = new WeatherData(

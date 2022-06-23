@@ -1,15 +1,37 @@
-# Examen Técnico Finvivir
+# Examen Técnico Finvivir Edgar Ivan Barrera Guerrero
+
+## Requerimientos
+
+* Docker
+
+Para docker
+* 1- crear el network
+* 2- levantar el contenedor de Mysql
+* 3- Segundo: levantar el contenedor de SpringBoot
+
+## Crear Network
+
+* docker network create examen-mysql
 
 ## Instrucciones DOCKER MYSQL
 
-### Descargamos una imagen
-Lo primero que hay que hacer es descargar el contenedor de Mysql con el siguiente comando (dejar el comando como se escribio).
+* docker container run --name mysqldb --network examen-mysql -e MYSQL_ROOT_PASSWORD=secret -e MYSQL_DATABASE=weatherFinvivir -d -p 3306:3306 mysql:8
 
-docker run -d -p 33060:3306 --name mysql-db -e MYSQL_ROOT_PASSWORD=secret mysql
+Verificar que Mysql arranco exitosamente y continuar con el siguiente paso
+
+
+## Instrucciones DOCKER PROYECTO SPRING BOOT
+
+* Dirigirse por consola al root del proyecto donde este el DockerFile
+* mvn clean package
+* docker image build -t pruebaeibg .
+* docker container run --network examen-mysql --name pruebaeibg-container -p 8080:8080 -d pruebaeibg
+
+Verificar que SpringBoot arranco exitosamente y probar los endpoints con postman.
 
 ### Pasos para acceder al contenedor MYSQL
 
-docker exec -it mysql-db mysql -uroot -p
+* docker exec -it mysqldb mysql -uroot -p
 
 * La base de datos creada se llama: weatherFinvivir
 * La tabla creada se llamada: t_weather

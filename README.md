@@ -12,7 +12,7 @@
 
 * docker container run --name mysqldb --network examen-mysql -e MYSQL_ROOT_PASSWORD=secret -e MYSQL_DATABASE=weatherFinvivir -d -p 3306:3306 mysql:8
 
-Verificar que Mysql arranco exitosamente y continuar con el siguiente paso
+Consultar los LOGS del container Mysql y verificar que arranco exitosamente y continuar con el siguiente paso
 
 ## 3.- Construir y ejecutar imagen de proyecto Spring boot
 * Clonar repositorio con GIT
@@ -23,7 +23,7 @@ Ejecutar los siguientes comandos
 * docker image build -t pruebaeibg .
 * docker container run --network examen-mysql --name pruebaeibg-container -p 8080:8080 -d pruebaeibg
 
-Verificar que SpringBoot arranco exitosamente y probar los endpoints con postman.
+Consultar los LOGS del container SpringBoot y verificar que arranco exitosamente y probar los endpoints con postman.
 
 ## Proyecto Spring boot
 
@@ -36,7 +36,7 @@ Ejecutar los siguientes comandos
 * docker container run --network examen-mysql --name pruebaeibg-container -p 8080:8080 -d pruebaeibg
 
 
-Verificar que SpringBoot arranco exitosamente y probar los endpoints con postman.
+Consultar los LOGS del container SpringBoot y verificar que arranco exitosamente y probar los endpoints con postman.
 
 ### Pasos para acceder al contenedor MYSQL
 

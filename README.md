@@ -3,13 +3,6 @@
 ## Requerimientos
 
 * Docker
-* Java 8
-* Maven
-
-Para docker
-* 1- crear el network
-* 2- levantar el contenedor de Mysql
-* 3- Segundo: levantar el contenedor de SpringBoot
 
 ## 1.- Crear Network
 
@@ -21,14 +14,25 @@ Para docker
 
 Verificar que Mysql arranco exitosamente y continuar con el siguiente paso
 
+## 3.- Construir y ejecutar imagen de proyecto Spring boot
 
-## 3.- Instrucciones DOCKER PROYECTO SPRING BOOT
+* Descomprimir la carpeta "compilado" adjunta en el email
+* Para levantar el contenedor dirigirse por consola a la carpeta "compilado"
 
-* clonar el proyecto con git
-* Dirigirse por consola al root del proyecto donde este el DockerFile
-* mvn clean package
+Ejecutar los siguientes comandos
 * docker image build -t pruebaeibg .
 * docker container run --network examen-mysql --name pruebaeibg-container -p 8080:8080 -d pruebaeibg
+
+## Proyecto Spring boot
+
+* clonar el proyecto con git
+* Generar nuevo compilado jar: mvn clean package
+* Dirigirse por consola al root del proyecto donde este el DockerFile
+
+Ejecutar los siguientes comandos
+* docker image build -t pruebaeibg .
+* docker container run --network examen-mysql --name pruebaeibg-container -p 8080:8080 -d pruebaeibg
+
 
 Verificar que SpringBoot arranco exitosamente y probar los endpoints con postman.
 

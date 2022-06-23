@@ -15,13 +15,15 @@
 Verificar que Mysql arranco exitosamente y continuar con el siguiente paso
 
 ## 3.- Construir y ejecutar imagen de proyecto Spring boot
-
-* Descomprimir la carpeta "compilado" adjunta en el email
+* Clonar repositorio con GIT
+* Descomprimir la carpeta "compilado" adjunta en el root del proyecto
 * Para levantar el contenedor dirigirse por consola a la carpeta "compilado"
 
 Ejecutar los siguientes comandos
 * docker image build -t pruebaeibg .
 * docker container run --network examen-mysql --name pruebaeibg-container -p 8080:8080 -d pruebaeibg
+
+Verificar que SpringBoot arranco exitosamente y probar los endpoints con postman.
 
 ## Proyecto Spring boot
 
